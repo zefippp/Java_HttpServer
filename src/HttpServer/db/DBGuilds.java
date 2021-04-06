@@ -47,27 +47,6 @@ public class DBGuilds implements DB {
 
     @Override
     public void update(Guild _guild) {
-        File file = new File("api/guilds/" + _guild.getId() + ".json");
-        FileWriter fileWriter = null;
-        try {
-            fileWriter = new FileWriter(file.getCanonicalPath());
-            JsonObject jsonObject = (JsonObject) new JsonParser().parse(new FileReader(file.getCanonicalPath()));
-            System.out.println((String) jsonObject.get("name"));
-            ArrayList<Guild> guilds = new Gson().fromJson(Files.readAllLines(Path.of("api/guilds/" + _guild.getId() + ".json")), ArrayList.class);
-            for (Guild guild : guilds) {
-                System.out.println(guild.getName());
-                if (guild.getId().equals(_guild.getId())) {
-                    System.out.println("equals");
-                    guilds.remove(guild);
-                    guilds.add(_guild);
-                }
-            }
-            System.out.println(Files.readAllLines(Path.of("api/guilds/" + _guild.getId() + ".json")));
-            fileWriter.write(new Gson().toJson(guilds));
-            fileWriter.flush();
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 }
