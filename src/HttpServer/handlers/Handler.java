@@ -1,7 +1,5 @@
 package HttpServer.handlers;
 
-import HttpServer.db.DBGuilds;
-import HttpServer.db.pojo.Guild;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import kotlin.text.Charsets;
@@ -20,16 +18,7 @@ public abstract class Handler implements HttpHandler {
         switch (exchange.getRequestMethod()) {
             case "POST" -> doPost(exchange);
             case "GET" -> {
-                try {
-                    System.out.println(new DBGuilds().get("810591912107966504").get("name"));
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
-                String content = Files.readString(Path.of("api" + exchange.getRequestURI().getPath() + ".json"), Charsets.UTF_8);
-                System.out.println("content:\n" + content);
-                Map<String, String> args = parseGetRequest(exchange);
-                System.out.println(Arrays.toString(new Map[]{args}));
-                handleResponse(exchange, content);
+                handleGet(exchange);
                 doGet(exchange);
             }
         }
@@ -51,17 +40,18 @@ public abstract class Handler implements HttpHandler {
         return args;
     }
 
-    public void handleResponse(HttpExchange httpExchange, String requestParamValue) throws IOException {
-        OutputStream outputStream = httpExchange.getResponseBody();
+    public void handleGet(HttpExchange exchange) throws IOException {
+        String content = Files.readString(Path.of("api" + exchange.getRequestURI().getPath() + ".json"), Charsets.UTF_8);
+        OutputStream outputStream = exchange.getResponseBody();
         StringBuilder htmlBuilder = new StringBuilder();
 
         htmlBuilder.append("<body style=\"background-color: #111\">");
         htmlBuilder.append("<h1 style=\"font-family: monospace;color: #ffffff;\">");
-        htmlBuilder.append(requestParamValue);
+        htmlBuilder.append(content);
         htmlBuilder.append("</h1>");
         htmlBuilder.append("</body>");
 
-        httpExchange.sendResponseHeaders(200, htmlBuilder.toString().length());
+        exchange.sendResponseHeaders(200, htmlBuilder.toString().length());
 
         outputStream.write(htmlBuilder.toString().getBytes());
         outputStream.flush();

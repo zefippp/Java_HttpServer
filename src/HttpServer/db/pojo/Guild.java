@@ -1,12 +1,32 @@
 package HttpServer.db.pojo;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Guild {
-    String name;
-    String id;
+    @SerializedName("name")
+    private String name;
+    @SerializedName("id")
+    private String id;
+    @SerializedName("token")
+    private String token;
 
     public Guild(String name, String id) {
         this.name = name;
         this.id = id;
+    }
+
+    public Guild(String name, String id, String token) {
+        this.name = name;
+        this.id = id;
+        this.token = token;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getName() {

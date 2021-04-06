@@ -5,40 +5,39 @@ import HttpServer.db.pojo.Guild;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-import kotlin.text.Charsets;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HandlerGuild extends Handler {
 
     @Override
-    public void doPost(HttpExchange exchange) throws IOException {
-        System.out.println(exchange.getRequestURI());
+    public void doPost(HttpExchange exchange) {
+        System.out.println("POST: " + exchange.getRequestURI());
         Headers requestHeaders = exchange.getRequestHeaders();
 
-        int contentLength = Integer.parseInt(requestHeaders.getFirst("Content-length"));
-        String s = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        Map<String, String> map = new Gson().fromJson(s, HashMap.class);
-        //new DBGuilds().insert(new Guild(map.get("name"), map.get("id")));
-        new DBGuilds().remove(new Guild(map.get("name"), map.get("id")));
+        Guild request = null;
+        try {
+            String s = new String(exchange.getRequestBody().readAllBytes());
+            System.out.println(s);
+            request = new Gson().fromJson(s, Guild.class);
+            new DBGuilds().update(request);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            String response = new Gson().toJson(new Guild("Infinity Tsukuyomi", "810591912107966504"));
+            OutputStream outputStream = exchange.getResponseBody();
+            exchange.sendResponseHeaders(HttpURLConnection.HTTP_CREATED, response.getBytes().length);
 
-        byte[] data = new byte[contentLength];
-
-        exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, contentLength);
-
-        OutputStream os = exchange.getResponseBody();
-
-        os.write(data);
-        os.flush();
-        exchange.close();
+            outputStream.write(response.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            exchange.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("close connection...");
     }
 }
